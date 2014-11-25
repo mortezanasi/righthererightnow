@@ -43,9 +43,10 @@ var RestaurantApp = Class.extend({
                     d.LatLng = new L.LatLng(+d.latitude, +d.longitude);
 
                     var today = new Date();
-                    d.myDate = parseDate(d.license_start_date);
+
+                    //d.myDate = parseDate(d.license_start_date);
                     
-                    d.daysAgo = (today - d.myDate) / 1000 / 60 / 60 / 24; //7-373
+                    //d.daysAgo = (today - d.myDate) / 1000 / 60 / 60 / 24; //7-373
 
                     //Filter based on license description
                     if(d.license_description =='Music and Dance' 
@@ -66,49 +67,60 @@ var RestaurantApp = Class.extend({
                         if(d.license_description =='Music and Dance') {
                             var redMarker = 
                             L.AwesomeMarkers.icon({icon: 'music', markerColor: 'orange', prefix: 'fa', iconColor: 'black'});
+                            d.status_message = 'Music is Life!!!';
                         }
                         else if(d.license_description =='Mobile Food License'){
                             var redMarker = 
                              L.AwesomeMarkers.icon({icon: 'cutlery', markerColor: 'orange', prefix: 'fa', iconColor: 'black'});
+                             d.status_message = 'Food Carts are awesome!';
                         }
                         else if (d.license_description =='Navy Pier Kiosk License'){
                             var redMarker = 
                              L.AwesomeMarkers.icon({icon: 'star', markerColor: 'orange', prefix: 'fa', iconColor: 'black'});
+                             d.status_message = 'Welcome to Navy Pier!';
                         }
                         else if (d.license_description == 'Outdoor Patio'){
                             var redMarker = 
                              L.AwesomeMarkers.icon({icon: 'star', markerColor: 'orange', prefix: 'fa', iconColor: 'black'});
+                             d.status_message = 'Treat your gastronomic fantasies!';
                         }
                         else if (d.license_description == 'Package Goods'){
                             var redMarker = 
                              L.AwesomeMarkers.icon({icon: 'archive', markerColor: 'orange', prefix: 'fa', iconColor: 'black'});
+                             d.status_message = 'Buy goods and more!';
                         }
                         else if (d.license_description == 'Public Garage'){
                             var redMarker = 
                              L.AwesomeMarkers.icon({icon: 'automobile', markerColor: 'orange', prefix: 'fa', iconColor: 'black'});
+                             d.status_message = 'Park like a boss!';
                         }
                         else if (d.license_description == 'Tavern') {
                             var redMarker = 
                              L.AwesomeMarkers.icon({icon: 'beer', markerColor: 'orange', prefix: 'fa', iconColor: 'black'});
+                             d.status_message = 'Burp!!!';
                         }
                         else if (d.license_description == 'Special Event Food'){
                             var redMarker = 
                              L.AwesomeMarkers.icon({icon: 'cutlery', markerColor: 'orange', prefix: 'fa', iconColor: 'black'});
+                             d.status_message = 'Treat your gastronomic fantasies!';
                         }
                         else if (d.license_description == 'Retail Food Establishment'){
                             var redMarker = 
                              L.AwesomeMarkers.icon({icon: 'cutlery', markerColor: 'orange', prefix: 'fa', iconColor: 'black'});
+                             d.status_message = 'OM NOM NOM!!';
                         }
                         else if (d.license_description == 'Public Place of Amusement') {
                             var redMarker = 
                              L.AwesomeMarkers.icon({icon: 'star', markerColor: 'orange', prefix: 'fa', iconColor: 'black'});
+                             d.status_message = 'Fun and Food with your family!';
                         }
                         else if (d.license_description == 'Wholesale Food Establishment'){
                             var redMarker = 
                              L.AwesomeMarkers.icon({icon: 'cutlery', markerColor: 'orange', prefix: 'fa', iconColor: 'black'});
+                             d.status_message = 'Treat your gastronomic fantasies!';
                         }
 
-                            d.status_message = 'Treat your gastronomic fantasies!';
+                            
                             restaurantFeatureJson = {
                                 "type": "Feature",
                                     "properties": {},
@@ -122,7 +134,8 @@ var RestaurantApp = Class.extend({
                             L.geoJson(restaurantFeatureJson, { 
                                 pointToLayer: function (feature, latlng) {
                                     
-                                    var content = '<P><B> Restaurant Name : </B>'+ d.doing_business_as_name 
+                                    var content = '<b><center><u>POI Card</u></center></b>'
+                                                + '<P><B>Name : </B>'+ d.doing_business_as_name 
                                                 + '<br><B> Type: </B>' 
                                                 + d.license_description + '<B><BR> Street:</b> ' 
                                                 + d.address + '<BR><b>'

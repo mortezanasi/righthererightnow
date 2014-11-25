@@ -143,11 +143,15 @@ var mapContainer = Class.extend({
           abandonVehicleApp.abandonLayerFunc(window.currentBox[0],window.currentBox[1],window.currentBox[2],window.currentBox[3], true);
           window.avc++;
         }, this.abandonRefreshInt);
+        window.cc = 0;
         crimeLoop = setInterval(function() {
 		  recentCrimeApp.recentCrimeLayerFunc(window.currentBox[0],window.currentBox[1],window.currentBox[2],window.currentBox[3], true);
+	      window.cc++;
 		}, this.crimeRefreshInt);
+		window.sc = 0;
 		streetlightLoop = setInterval(function() {
 		  streetLightApp.streetLightLayerFunc(window.currentBox[0],window.currentBox[1],window.currentBox[2],window.currentBox[3], true);
+		  window.sc++;
 		}, this.streetlightRefreshInt);
         toggleLayer('PotHolesLayer');
 
@@ -260,7 +264,7 @@ var mapContainer = Class.extend({
             wayPoints[i] = this.Router._line._route.coordinates[i];
             
                 // WayPoint Check
-                marArray[i] =  L.marker([wayPoints[i][0],wayPoints[i][1]]).addTo(this.map);
+                //marArray[i] =  L.marker([wayPoints[i][0],wayPoints[i][1]]).addTo(this.map);
 				window.currentEnds.push([wayPoints[i][0], wayPoints[i][1]]);
                 this.markerArray[j] = marArray[i];
                 j= j+ 1;
@@ -331,16 +335,20 @@ var mapContainer = Class.extend({
 			}
 			window.avc++;
 		}, this.abandonRefreshInt);
+		window.cc = 0;
 		crimeLoop = setInterval(function() {
 		  for (i=0; i<window.currentEnds.length; i++) {
 				recentCrimeApp.recentCrimePolylineLayerFunc(window.currentEnds[i][0],window.currentEnds[i][1],true);
 		   }
+		   window.cc++;
 		}, this.crimeRefreshInt);
+		window.sc = 0;
 		streetlightLoop = setInterval(function() {
 		  for (i=0; i<window.currentEnds.length; i++) {
                     this.iterator = 'XX';
 				streetLightApp.streetLightPolylineLayerFunc(window.currentEnds[i][0],window.currentEnds[i][1],true);
 		   }
+		   window.sc++;
 		}, this.streetlightRefreshInt);
 		//this.polyline.on("waypointschanged", alert("linetouched, man"));
 		
@@ -484,12 +492,17 @@ var mapContainer = Class.extend({
 		window.started = false;
        // console.log(this.markerArray[0]+ ' ' +this.markerArray.length);
 
-        if((this.markerArray).length >0){
-            for (var i = 0 ; i<=this.markerArray.length; i++){
-                this.map.removeLayer(this.markerArray[i]);
-            } 
-        }
+        //~ if((this.markerArray).length >0){
+            //~ for (var i = 0 ; i<=this.markerArray.length; i++){
+                //~ this.map.removeLayer(this.markerArray[i]);
+            //~ } 
+        //~ }
         clearAllLayers();
+        setTimeout(function() {
+        d3.select(".leaflet-marker-pane").html(null);
+        d3.select(".leaflet-shadow-pane").html(null);
+        }, 500);
+
     },
     init: function(whereToRender){
     
@@ -498,8 +511,8 @@ var mapContainer = Class.extend({
     ///////////////////////////////////////////////////////////
 
         this.map = L.map(whereToRender, {
-            center: [41.869910, -87.65],
-            zoom: 16,
+            center: [41.867490, -87.633645],
+            zoom: 15,
             layers: [this.Aerial]
             });
         

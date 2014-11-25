@@ -29,6 +29,7 @@ function clearAllLayers() {
 	clearInterval(crimeLoop);
 	clearInterval(streetlightLoop);
 	clearInterval(divvyLoop);
+	d3.selectAll(".leaflet-marker-pane").html(null);
 }
 
 function toggleLayer(layerName) {

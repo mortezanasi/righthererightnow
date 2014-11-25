@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////
 // Project 3 Group 6 : Right Here!! Right Now!!
-// Last Modified by Sharad on 6th November
+// Last Modified by Sharad on 24th November
 // Creating Recent Crime
 ////////////////////////////////////////////////////////////////////
 var RecentCrimeApp = Class.extend({
@@ -38,17 +38,7 @@ var RecentCrimeApp = Class.extend({
 
         this.barWidth = 0;
         this.barHeight = 0;
-        /*
-        this.barMargin2 = {top: 100, right: 20, bottom: 200, left: 110};
-        this.barCanvasWidth2 = 1500;
-        this.barCanvasHeight2 = 800;
-
-        this.barWidth2 = 0;
-        this.barHeight2 = 0;
-*/
         this.svgBar = null;
-      //  this.svgBar2 = null;
-        
         this.myTag = "";
         //this.myTag2 = "";
     },
@@ -59,13 +49,6 @@ var RecentCrimeApp = Class.extend({
         this.myTag = whereToRender;
         this.updateScreen();
     },
-/*    startup2: function (whereToRender)
-    {
-        //console.log('Inside Recent Crime Startup');
-        this.myTag2 = whereToRender;
-        this.updateScreen2();
-    },
-    */
     /////////////////////////////////////////////////////////////
     
      //Drawing the bar chart for Origin distribution for the first visualization group.  
@@ -386,19 +369,6 @@ var RecentCrimeApp = Class.extend({
         .attr("width", this.barWidth)
         .attr("height", this.barHeight)
         .attr("viewBox", "" + -this.barMargin.left + " 0 " + totalBarSizeX + " " + this.barCanvasHeight);
-         /*       else if(this.myTag2 =="#crimechart2"){
-                    xWin = d3.select(this.myTag2).style("width");
-                    yWin = d3.select(this.myTag2).style("height");
-                    this.barWidth = xWin;
-                    this.barHeight = yWin;
-                    
-                    this.svgBar2 = d3.select("#crimechart2").append("svg:svg")
-                    .attr("width", this.barWidth)
-                    .attr("height", this.barHeight)
-                    .attr("viewBox", "" + -this.barMargin.left + " 0 " + totalBarSizeX + " " + this.barCanvasHeight);
-                    
-                }
-        */
                    
     },
 
@@ -485,7 +455,7 @@ var RecentCrimeApp = Class.extend({
                     //console.log('CRIME DATA' +  ' ' + crimeWeekSelection +  ' '  + crimeMonthSelection +  ' '+ crimeWeekChicago +  ' '+ crimeMonthChicago + 'Ones that matter ' + batteryWeekSelection + ' ' + propertyMonthSelection );
                     var crimechartJson = 
                     [
-                        {"AreaFocus": "SelectedArea", "Week" : crimeWeekSelection, "Month" : crimeMonthSelection},
+                        {"AreaFocus": "SelectedArea", "Week" : mapContainer.crimeWeekSeen.length, "Month" : mapContainer.crimeMonthSeen.length},
                         {"AreaFocus": "Chicago", "Week" : crimeWeekChicago, "Month" : crimeMonthChicago}
                         
                     ];
@@ -538,6 +508,8 @@ var RecentCrimeApp = Class.extend({
         if (!update) {
           var recentCrimeFeatureJson ={};
           mapContainer.crimeSeen = [];
+          mapContainer.crimeWeekSeen = [];
+          mapContainer.crimeMonthSeen = [];
         }
         var crimeWeekCounter = 0;
         var crimeMonthCounter = 0;
@@ -552,7 +524,7 @@ var RecentCrimeApp = Class.extend({
         recentCrimeCollection.forEach(function(d) {
 
          var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
-        if (!update) {
+        if ((!update) || (window.cc < 5)) {
             if (d.latitude && d.longitude)
                 {
                     mapContainer.crimeSeen.push(d.case_);
@@ -573,17 +545,15 @@ var RecentCrimeApp = Class.extend({
 
                     d.status_message = 'Travel With Caution!';
                     if(d.daysAgo < 15){
-                        if(d._primary_decsription == 'BATTERY' || d._primary_decsription == 'ASSAULT' )
-                            {
-                                batteryWeekCounter = batteryWeekCounter + 1;
-                            }
-                         if(d._primary_decsription == 'BURGLARY' || d._primary_decsription == 'ROBBERY' || d._primary_decsription == 'THEFT' )
-                             {
-                                 propertyWeekCounter = propertyWeekCounter + 1;
-                             }
+                        if(d._primary_decsription == 'BATTERY' || d._primary_decsription == 'ASSAULT' ){
+                            batteryWeekCounter = batteryWeekCounter + 1;
+                        }
+                        if(d._primary_decsription == 'BURGLARY' || d._primary_decsription == 'ROBBERY' || d._primary_decsription == 'THEFT' ){
+                            propertyWeekCounter = propertyWeekCounter + 1;
+                        }
                         
                         crimeWeekCounter = crimeWeekCounter + 1;
-                           
+                        mapContainer.crimeWeekSeen.push(d.case_);
                         /////
                         // Creating geoJson for Marker
                         ///// 
@@ -601,34 +571,32 @@ var RecentCrimeApp = Class.extend({
                         /////
                         L.geoJson(recentCrimeFeatureJson, { 
                             pointToLayer: function (feature, latlng) {
-                                
-                                var content = '<P><B> Date Reported: </B>' 
-                                            + moment(d.myDate).format("MMM Do YYYY HH:mm") + '<br /><B> Description: </B>' 
-                                            + d._primary_decsription + '<B><BR> Street:</b> ' 
-                                            + d.block + '<BR><b>'
-                                            + d.status_message +  '</b></P>';      
+                                    
+                                    var content = '<b><center><u>Crime Card</u></center></b>'
+                                                + '<P><B> Date Reported: </B>' 
+                                                + moment(d.myDate).format("MMM Do YYYY HH:mm") + '<br /><B> Type: </B>' 
+                                                + d._primary_decsription + '<B><BR> Street:</b> ' 
+                                                + d.block + '<BR><b>'
+                                                + d.status_message +  '</b></P>';      
                                 //console.log('CRIME');
                                 var popup = L.popup().setContent(content);
 
-                               /* 
-                                var oldLeafIcon = L.Icon.extend({
-                                    options: {
-                                        //shadowUrl: '../docs/images/leaf-shadow.png',
-                                        iconSize:     [25, 25],
-                                        //shadowSize:   [50, 64],
-                                        iconAnchor:   [0, 0],
-                                        //shadowAnchor: [4, 62],
-                                        popupAnchor:  [0, 0],
-                                        opacity : 0.2
-                                    }
-                                });
-                                */
-                                //var olderIcon = new oldLeafIcon({iconUrl: './images/Police_Badge.png'});
                                 
-                                var redMarker = 
-                             L.AwesomeMarkers.icon({icon: 'times', markerColor: 'red', prefix: 'fa', iconColor: 'black'});
+                                    var oldLeafIcon = L.Icon.extend({
+                                        options: {
+                                            //shadowUrl: '../docs/images/leaf-shadow.png',
+                                            iconSize:     [55, 55],
+                                            //shadowSize:   [50, 64],
+                                            //iconAnchor:   [0, 0],
+                                            //shadowAnchor: [4, 62],
+                                            popupAnchor:  [0, 0],
+                                            opacity : 0.2
+                                        }
+                                    });
+                                    
+                                    var olderIcon = new oldLeafIcon({iconUrl: './images/icon-recent-crime-bright-red.png'});
 
-                                var marker = L.marker(latlng,{icon: redMarker});
+                                    var marker = L.marker(latlng,{icon: olderIcon});
                                                 marker.bindPopup(popup);
                                             return marker;  
                                         
@@ -647,12 +615,12 @@ var RecentCrimeApp = Class.extend({
                                  propertyMonthCounter = propertyMonthCounter + 1;
                              }
                         
-                        
+                        mapContainer.crimeMonthSeen.push(d.case_);
                         crimeMonthCounter = crimeMonthCounter + 1;
                         /////
                         // Creating geoJson for Marker
                         /////
-                        crimeFeatureJson = {
+                        recentCrimeFeatureJson = {
                             "type": "Feature",
                                 "properties": {},
                                 "geometry": {
@@ -660,34 +628,48 @@ var RecentCrimeApp = Class.extend({
                                     "coordinates": [d.longitude,d.latitude]
                                 }
                         }
-                        if (d.status) {
-                            /////
-                            // Creating markers
-                            /////
-                            L.geoJson(recentCrimeFeatureJson, { 
-                                pointToLayer: function (feature, latlng) {
-                                    
-                                    var content = '<P><B> Date Reported: </B>' 
-                                                + moment(d.myDate).format("MMM Do YYYY HH:mm") + '<B> Status: </B>' 
-                                                + d.status + '<B><BR> Street: </b> ' 
-                                                + d.street_address + '<BR><b>'
-                                                + d.status_message +  '</b></P>';      
+                        /////
+                        // Creating markers
+                        /////
+                        L.geoJson(recentCrimeFeatureJson, { 
+                            pointToLayer: function (feature, latlng) {
+                                
+                                var content = '<b><center><u>Crime Card</u></center></b>'
+                                            + '<P><B> Date Reported: </B>' 
+                                            + moment(d.myDate).format("MMM Do YYYY HH:mm") + '<br /><B> Description: </B>' 
+                                            + d._primary_decsription + '<B><BR> Street:</b> ' 
+                                            + d.block + '<BR><b>'
+                                            + d.status_message +  '</b></P>';       
                                     //console.log('CRIME');
                                     var popup = L.popup().setContent(content);
     
-                                    /*var blueMarkerOptions = {
-                                        radius: 10,
-                                        fillColor: "Blue",
-                                        color: "#000",
-                                        weight: 1,
-                                        opacity: 1,
-                                        fillOpacity: 0.8
-                                    };
-                                    */
-    
-                                            var redMarker = 
-                                 L.AwesomeMarkers.icon({icon: 'times', markerColor: 'grey', prefix: 'fa', iconColor: 'black'});
-                                var marker = L.marker(latlng, {icon: redMarker});
+                                var blueMarkerOptions = {
+                                    radius: 10,
+                                    fillColor: "Blue",
+                                    color: "#000",
+                                    weight: 1,
+                                    opacity: 1,
+                                    fillOpacity: 0.8
+                                };
+                                var oldLeafIcon = L.Icon.extend({
+                                options: {
+                                    //shadowUrl: '../docs/images/leaf-shadow.png',
+                                    iconSize:     [55, 55],
+                                    //shadowSize:   [50, 64],
+                                    iconAnchor:   [0, 0],
+                                    //shadowAnchor: [4, 62],
+                                    popupAnchor:  [0, 0],
+                                    opacity : 0.2
+                                }
+                            });
+                            
+                            var olderIcon = new oldLeafIcon({iconUrl: './images/icon-recent-crime-dark-50.png'});
+                                
+                                
+
+                            //var redMarker = 
+                            // L.AwesomeMarkers.icon({icon: 'times', markerColor: 'grey', prefix: 'fa', iconColor: 'black'});
+                            var marker = L.marker(latlng, {icon: olderIcon});
                                     marker.bindPopup(popup);
                                 return marker;  
                                         
@@ -697,8 +679,9 @@ var RecentCrimeApp = Class.extend({
                     }
 
                 }
-            } else if (mapContainer.crimeSeen.indexOf(d.case_) == -1) {
-                mapContainer.potholesSeen.push(d.case_);
+            else if (mapContainer.crimeSeen.indexOf(d.case_) == -1) {
+                mapContainer.crimeSeen.push(d.case_);
+    
                 window.updates.push("New crime data found at "+d.block+" - "+d._primary_description+"<br />");
                 if (d.latitude && d.longitude)
                 {
@@ -719,7 +702,8 @@ var RecentCrimeApp = Class.extend({
 
                     d.status_message = 'Travel With Caution!';
                     if(d.daysAgo < 15){
-                           
+                           crimeWeekCounter = crimeWeekCounter + 1;
+                           mapContainer.crimeWeekSeen.push(d.case_);
                         /////
                         // Creating geoJson for Marker
                         ///// 
@@ -738,7 +722,8 @@ var RecentCrimeApp = Class.extend({
                         L.geoJson(recentCrimeFeatureJson, { 
                             pointToLayer: function (feature, latlng) {
                                 
-                                var content = '<P><B> Date Reported: </B>' 
+                                var content = '<b><center><u>Crime Card</u></center></b>'
+                                            + '<P><B> Date Reported: </B>' 
                                             + moment(d.myDate).format("MMM Do YYYY HH:mm") + '<br /><B> Description: </B>' 
                                             + d._primary_decsription + '<B><BR> Street:</b> ' 
                                             + d.block + '<BR><b>'
@@ -746,11 +731,11 @@ var RecentCrimeApp = Class.extend({
                                 //console.log('CRIME');
                                 var popup = L.popup().setContent(content);
 
-                               /* 
+                            
                                 var oldLeafIcon = L.Icon.extend({
                                     options: {
                                         //shadowUrl: '../docs/images/leaf-shadow.png',
-                                        iconSize:     [25, 25],
+                                        iconSize:     [55, 55],
                                         //shadowSize:   [50, 64],
                                         iconAnchor:   [0, 0],
                                         //shadowAnchor: [4, 62],
@@ -758,13 +743,13 @@ var RecentCrimeApp = Class.extend({
                                         opacity : 0.2
                                     }
                                 });
-                                */
-                                //var olderIcon = new oldLeafIcon({iconUrl: './images/Police_Badge.png'});
                                 
-                                var redMarker = 
-                             L.AwesomeMarkers.icon({icon: 'times', markerColor: 'red', prefix: 'fa', iconColor: 'black'});
+                                var olderIcon = new oldLeafIcon({iconUrl: './images/icon-recent-crime-bright-red.png'});
+                                
+                            //    var redMarker = 
+                             //L.AwesomeMarkers.icon({icon: 'times', markerColor: 'red', prefix: 'fa', iconColor: 'black'});
 
-                                var marker = L.marker(latlng,{icon: redMarker});
+                                var marker = L.marker(latlng,{icon: olderIcon});
                                                 marker.bindPopup(popup);
                                             return marker;  
                                         
@@ -773,10 +758,13 @@ var RecentCrimeApp = Class.extend({
 
                     }
                     else if (d.daysAgo < 31){
+
+                        crimeMonthCounter = crimeMonthCounter + 1;
                         /////
                         // Creating geoJson for Marker
                         /////
-                        streetFeatureJson = {
+                        mapContainer.crimeMonthSeen.push(d.case_);
+                        recentCrimeFeatureJson = {
                             "type": "Feature",
                                 "properties": {},
                                 "geometry": {
@@ -784,40 +772,44 @@ var RecentCrimeApp = Class.extend({
                                     "coordinates": [d.longitude,d.latitude]
                                 }
                         }
-                        if (d.status) {
-                            /////
-                            // Creating markers
-                            /////
-                            L.geoJson(recentCrimeFeatureJson, { 
-                                pointToLayer: function (feature, latlng) {
-                                    
-                                    var content = '<P><B> Date Reported: </B>' 
-                                                + moment(d.myDate).format("MMM Do YYYY HH:mm") + '<B> Status: </B>' 
-                                                + d.status + '<B><BR> Street: </b> ' 
-                                                + d.street_address + '<BR><b>'
-                                                + d.status_message +  '</b></P>';      
+                        /////
+                        // Creating markers
+                        /////
+                        L.geoJson(recentCrimeFeatureJson, { 
+                            pointToLayer: function (feature, latlng) {
+                                
+                                var content = '<b><center><u>Crime Card</u></center></b>'
+                                            + '<P><B> Date Reported: </B>' 
+                                            + moment(d.myDate).format("MMM Do YYYY HH:mm") + '<br /><B> Description: </B>' 
+                                            + d._primary_decsription + '<B><BR> Street:</b> ' 
+                                            + d.block + '<BR><b>'
+                                            + d.status_message +  '</b></P>';       
                                     //console.log('CRIME');
                                     var popup = L.popup().setContent(content);
     
-                                    /*var blueMarkerOptions = {
-                                        radius: 10,
-                                        fillColor: "Blue",
-                                        color: "#000",
-                                        weight: 1,
-                                        opacity: 1,
-                                        fillOpacity: 0.8
-                                    };
-                                    */
+                               
+                        
+                            var oldLeafIcon = L.Icon.extend({
+                                options: {
+                                    //shadowUrl: '../docs/images/leaf-shadow.png',
+                                    iconSize:     [55, 55],
+                                    //shadowSize:   [50, 64],
+                                    iconAnchor:   [0, 0],
+                                    //shadowAnchor: [4, 62],
+                                    popupAnchor:  [0, 0],
+                                    opacity : 0.2
+                                }
+                            });
     
-                                            var redMarker = 
-                                 L.AwesomeMarkers.icon({icon: 'times', markerColor: 'grey', prefix: 'fa', iconColor: 'black'});
-                                var marker = L.marker(latlng, {icon: redMarker});
-                                    marker.bindPopup(popup);
-                                return marker;  
+                            var olderIcon = new oldLeafIcon({iconUrl: './images/icon-recent-crime-dark-50.png'});
+                            
+                            var marker = L.marker(latlng,{icon: olderIcon});
+                                            marker.bindPopup(popup);
+                                        return marker;  
                                         
                                 }
                             }).addTo(mapContainer.RecentCrimeLayer);
-                        }
+                        
                     }
 
                 }
@@ -857,7 +849,7 @@ var RecentCrimeApp = Class.extend({
         this.marLng2 = marLng2;
 
         // Clear data from the layer
-        mapContainer.RecentCrimeLayer.clearLayers(); 
+        //mapContainer.RecentCrimeLayer.clearLayers(); 
 
         var self = this;
 
@@ -867,20 +859,20 @@ var RecentCrimeApp = Class.extend({
 
         //var query = 'https://data.cityofchicago.org/resource/3c9v-pnva.json?$order=creation_date%20DESC&zip_code='.concat(zipCode);
         var query = "https://data.cityofchicago.org/resource/x2n5-8w5q.json?$where=within_box(location,".concat(zipCode);
-            query = query + '&$order=date_of_occurrence%20DESC';
+            query = query + '&$order=date_of_occurrence%20DESC&$limit=20000';
 
         console.log('RecentCrime'  + query);
 
         d3.json(
             query, 
-            function(err, response,update)
+            function(err, response)
                 {
                 if(err)
                     {
                     //console.log("NO DATA at " + lat + " " + lon);
                     return;
                     }
-                    self.makeCallbackFunc(response);
+                    self.makeCallbackFunc(response,update);
                 });
 
     },
@@ -895,7 +887,7 @@ var RecentCrimeApp = Class.extend({
 
         // Clear previous data from the layer
 
-        mapContainer.RecentCrimeLayer.clearLayers();
+        //mapContainer.RecentCrimeLayer.clearLayers();
 
         var self = this;
 
@@ -906,7 +898,7 @@ var RecentCrimeApp = Class.extend({
 
         var query = "https://data.cityofchicago.org/resource/x2n5-8w5q.json?$where=within_circle(location,".concat(zipCode);
         //https://soda.demo.socrata.com/resource/earthquakes.json?$where=within_circle(location, 47.616810, -122.328064, 50000)
-            query = query + '&$order=date_of_occurrence%20DESC';
+            query = query + '&$order=date_of_occurrence%20DESC&$limit=20000';
 
         console.log(query);
         //var query = 'https://data.cityofchicago.org/resource/3c9v-pnva.json?$order=creation_date%20DESC&zip_code='.concat(zipCode);
@@ -914,14 +906,14 @@ var RecentCrimeApp = Class.extend({
         //'http://data.cityofchicago.org/resource/7as2-ds3y.json?zip='.concat(zipCode);
         d3.json(
             query, 
-            function(err, response,update)
+            function(err, response)
                 {
                 if(err)
                     {
                     console.log("NO DATA at " + this.marPolyLat + " " + this.marPolyLng );
                     return;
                     }
-                    self.makeCallbackFunc(response);
+                    self.makeCallbackFunc(response,update);
                 });
 
     },

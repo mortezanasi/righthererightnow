@@ -305,7 +305,9 @@ var AbandonVehicleApp = Class.extend({
     makeCallback: function (abandonVehicleCollection,update) {
         if (!update) {
             var abandonFeatureJson = {};
-            mapContainer.abandonSeen = [];        
+            mapContainer.abandonSeen = [];   
+            mapContainer.abandonWeekSeen = []; 
+            mapContainer.abandonMonthSeen = [];      
             // Clear data from the layer
             mapContainer.AbandonLayer.clearLayers();
         }
@@ -314,7 +316,7 @@ var AbandonVehicleApp = Class.extend({
         abandonVehicleCollection.forEach(function(d) {
 
          var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
-        if ((!update)  && (window.avc < 5)) {
+        if ((!update)  || (window.avc < 5)) {
             mapContainer.abandonSeen.push(d.service_request_number);
             if (d.latitude && d.longitude)
                 {
@@ -339,6 +341,7 @@ var AbandonVehicleApp = Class.extend({
 
                     if(d.daysAgo < 8){
                          abandonedWeekCounter = abandonedWeekCounter + 1;//CHANGE HERE
+                         mapContainer.abandonWeekSeen.push(d.service_request_number);
                             abandonFeatureJson = {
                                 "type": "Feature",
                                     "properties": {},
@@ -364,16 +367,16 @@ var AbandonVehicleApp = Class.extend({
                                     var oldLeafIcon = L.Icon.extend({
                                         options: {
                                             //shadowUrl: '../docs/images/leaf-shadow.png',
-                                            iconSize:     [25, 25],
+                                            iconSize:     [60, 60],
                                             //shadowSize:   [50, 64],
-                                            iconAnchor:   [10, 0],
+                                            iconAnchor:   [2, 0],
                                             //shadowAnchor: [4, 62],
                                             popupAnchor:  [0,0],
                                             opacity : 0.2
                                         }
                                     });
 
-                                var olderIcon = new oldLeafIcon({iconUrl: './images/abandoned_vehicle.png'});
+                                var olderIcon = new oldLeafIcon({iconUrl: './images/icon-abandoned-vehicle-bright-red.png'});
                                 var marker = L.marker(latlng,{icon: olderIcon});
                                     marker.bindPopup(popup);
                                 return marker;  
@@ -383,6 +386,7 @@ var AbandonVehicleApp = Class.extend({
                     }
                     else if(d.daysAgo< 31){
                         abandonedMonthCounter = abandonedMonthCounter + 1;
+                        mapContainer.abandonMonthSeen.push(d.service_request_number);
                             abandonFeatureJson = {
                                 "type": "Feature",
                                     "properties": {},
@@ -403,7 +407,7 @@ var AbandonVehicleApp = Class.extend({
                                                 + d.status_message +  '</P></b>';
                                     var popup = L.popup().setContent(content);
 
-                                    var redMarkerOptions = {
+                                 /*   var redMarkerOptions = {
                                         radius: 10,
                                         fillColor: "Red",
                                         color: "#000",
@@ -412,7 +416,22 @@ var AbandonVehicleApp = Class.extend({
                                         fillOpacity: 0.5
                                     };
 
-                                var marker = L.circleMarker(latlng, redMarkerOptions);
+                                */
+                                 var oldLeafIcon = L.Icon.extend({
+                                        options: {
+                                            //shadowUrl: '../docs/images/leaf-shadow.png',
+                                            iconSize:     [60, 60],
+                                            //shadowSize:   [50, 64],
+                                            iconAnchor:   [2, 0],
+                                            //shadowAnchor: [4, 62],
+                                            popupAnchor:  [0,0],
+                                            opacity : 0.2
+                                        }
+                                    });
+
+                                var olderIcon = new oldLeafIcon({iconUrl: './images/icon-abandoned-vehicle-bright-w.png'});
+                                //var marker = L.circleMarker(latlng, redMarkerOptions);
+                                var marker = L.marker(latlng,{icon: olderIcon});
                                     marker.bindPopup(popup);
                                 return marker;  
                                     
@@ -445,6 +464,7 @@ var AbandonVehicleApp = Class.extend({
                     } 
 
                     if(d.daysAgo < 8){
+                        mapContainer.abandonWeekSeen.push(d.service_request_number);
                             abandonFeatureJson = {
                                 "type": "Feature",
                                     "properties": {},
@@ -470,16 +490,16 @@ var AbandonVehicleApp = Class.extend({
                                     var oldLeafIcon = L.Icon.extend({
                                         options: {
                                             //shadowUrl: '../docs/images/leaf-shadow.png',
-                                            iconSize:     [50, 50],
+                                            iconSize:     [60, 60],
                                             //shadowSize:   [50, 64],
-                                            iconAnchor:   [10, 0],
+                                            iconAnchor:   [2, 0],
                                             //shadowAnchor: [4, 62],
                                             popupAnchor:  [0,0],
                                             opacity : 0.2
                                         }
                                     });
 
-                                var olderIcon = new oldLeafIcon({iconUrl: './images/abandoned_vehicle.png'});
+                                var olderIcon = new oldLeafIcon({iconUrl: './images/icon-abandoned-vehicle-bright-red.png'});
                                 var marker = L.marker(latlng,{icon: olderIcon});
                                     marker.bindPopup(popup);
                                 return marker;  
@@ -488,6 +508,7 @@ var AbandonVehicleApp = Class.extend({
                         }).addTo(mapContainer.AbandonLayer);
                     }
                     else if(d.daysAgo< 31){
+                        mapContainer.abandonWeekSeen.push(d.service_request_number);
                             abandonFeatureJson = {
                                 "type": "Feature",
                                     "properties": {},
@@ -508,16 +529,20 @@ var AbandonVehicleApp = Class.extend({
                                                 + d.status_message +  '</P></b>';
                                     var popup = L.popup().setContent(content);
 
-                                    var redMarkerOptions = {
-                                        radius: 10,
-                                        fillColor: "Red",
-                                        color: "#000",
-                                        weight: 1,
-                                        opacity: 1,
-                                        fillOpacity: 0.5
-                                    };
+                           var oldLeafIcon = L.Icon.extend({
+                                        options: {
+                                            //shadowUrl: '../docs/images/leaf-shadow.png',
+                                            iconSize:     [60, 60],
+                                            //shadowSize:   [50, 64],
+                                            iconAnchor:   [2, 0],
+                                            //shadowAnchor: [4, 62],
+                                            popupAnchor:  [0,0],
+                                            opacity : 0.2
+                                        }
+                                    });
 
-                                var marker = L.circleMarker(latlng, redMarkerOptions);
+                                var olderIcon = new oldLeafIcon({iconUrl: './images/icon-abandoned-vehicle-bright-w.png'});
+                                var marker = L.marker(latlng,{icon: olderIcon});
                                     marker.bindPopup(popup);
                                 return marker;  
                                     

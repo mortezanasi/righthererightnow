@@ -170,11 +170,22 @@ $( "#tabs" ).tabs();
 		window.updates = [];
 		mapContainer.mode = 'Box';
 		//mapContainer.iterator = 1;
+		console.log("points were "+mapContainer.marLat1+" "+mapContainer.marLng1+" and "+mapContainer.marLat2+" "+mapContainer.marLng2);
+		if((mapContainer.marLng1 > mapContainer.marLng2) && (mapContainer.marLat1 > mapContainer.marLat2)) {
+		  alert("please choose top left corner, then bottom right");
+		  clearMapFunc();
+
+		} else if ((mapContainer.marLng1 < mapContainer.marLng2) && (mapContainer.marLat1 < mapContainer.marLat2)) {
+		  alert("please choose top left corner, then bottom right");
+		  clearMapFunc();
+		}
+		
+		console.log("points are "+mapContainer.marLat1+" "+mapContainer.marLng1+" and "+mapContainer.marLat2+" "+mapContainer.marLng2);
 		mapContainer.getPolygonDataFunc();
 		//potHoleApp.callChicagoData()
 		weatherLoop = setInterval(function() {
 		  updateWeather();
-		}, 1000000);
+		}, 30000);
 		  
 	});
 	d3.select("#paths_select").on("click", function() {
@@ -477,8 +488,28 @@ $( "#tabs" ).tabs();
                 <!--<script src="js/sprite.coffee"></script>-->
                <!-- <script src="js/script.coffee"></script>-->
 				<script>
-					toggleLayer('PotHolesLayer');
+				   setTimeout(function() {
+					//toggleLayer('PotHolesLayer');
+					mapContainer.marLat1 = 41.867935;
+					mapContainer.marLng1 = -87.647939;
+					mapContainer.marLat2 = 41.861662;
+					mapContainer.marLng2 =  -87.614989;
+					window.UIMode = "paths";
+					mapContainer.mode = 'Path';
+					//mapContainer.iterator = 2;
+					mapContainer.createPolyLine();
+		
+					window.starttime = moment();
+					window.lastupdate = window.starttime;
+					window.updates = [];
+					//potHoleApp.callChicagoData()
+					setTimeout(function() { mapContainer.getPolyLineFunc() }, 1000);
 					
+					$("#lineupdate").toggle();
+					weatherLoop = setInterval(function() {
+					  updateWeather();
+					}, 30000);
+					}, 1000);
 				</script>
             </div>
         </div>

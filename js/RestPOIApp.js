@@ -53,7 +53,7 @@ var RestPOIApp = Class.extend({
                     // Choosing to show inspections done in last three months.. Good Enough??
                     if(d.daysAgo < 121){
                         // If the establishment passed the inspection.
-                        if(d.results == 'Pass'){
+                        if(d.results.substring(0, 4)== 'Pass'){
                             d.status_message = 'Treat your gastronomic fantasies!';
                             restPOIFeatureJson = {
                                 "type": "Feature",
@@ -71,7 +71,8 @@ var RestPOIApp = Class.extend({
                                         var content = '<b><center><u>Food Inspection Card</u></center></b><P><B> Restaurant Name: </B>'
                                                     + d.aka_name+ '<B><br>Inspection Date: </B>' 
                                                     + moment(d.myDate).format("MMM Do YYYY") + '<BR><B> Status: </B>' 
-                                                    + d.results + '<B><BR> Street: </B>' 
+                                                    + d.results + '<B><BR> Risk Level: ' + d.risk
+                                                    + '<B><BR> Street: ' 
                                                     + d.address + '<BR><b>'
                                                     + d.status_message +  '</b></P>';
                                         //console.log('ABANDON VeHICLE');
@@ -121,7 +122,8 @@ var RestPOIApp = Class.extend({
                                         
                                         var content = '<b><center><u>Food Inspection Card</u></center></b><P><B> Restaurant Name: </B>'+ d.aka_name+ '<B><br> Inspection Date: </B>' 
                                                     + moment(d.myDate).format("MMM Do YYYY") + '<B><br>Status : </B>' 
-                                                    + d.results + '<B><BR> Street: ' 
+                                                    + d.results + '<B><BR> Risk Level: ' + d.risk
+                                                    + '<B><BR> Street: ' 
                                                     + d.address + '<BR><b>'
                                                     + d.status_message +  '</b></P>';
                                         var popup = L.popup().setContent(content);

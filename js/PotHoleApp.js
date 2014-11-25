@@ -48,7 +48,7 @@ var PotHoleApp = Class.extend({
 
     startup: function (whereToRender)
     {
-        console.log('Inside Startup');
+        //console.log('Inside Startup');
         this.myTag = whereToRender;
         this.updateScreen();
     },
@@ -57,8 +57,8 @@ var PotHoleApp = Class.extend({
     //Drawing the bar chart for Origin distribution for the first visualization group.  
     drawBarChart: function (data)
     {
-        console.log('Inside drawBarChart');
-        console.log(data);
+        //console.log('Inside drawBarChart');
+        //console.log(data);
         this.updateWindow();
         var width = this.barCanvasWidth;
         var height = this.barCanvasHeight;
@@ -166,7 +166,7 @@ var PotHoleApp = Class.extend({
             .attr("y", function(d) {
                 return y(Math.max(d.Week, d.Month) + 10);
             })
-            .style("font-size","20pt");
+            .style("font-size","25pt");
 
         var legend = svg.selectAll(".legend")
             .data(flowNames.slice().reverse())
@@ -281,7 +281,7 @@ var PotHoleApp = Class.extend({
 
                     var PotHoleJson = 
                     [
-                        { "AreaFocus" : "SelectedArea", "Week" : potWeekSelection, "Month" : potMonthSelection},
+                        { "AreaFocus" : "SelectedArea", "Week" : mapContainer.potholesWeekSeen.length, "Month" : mapContainer.potholesMonthSeen.length},
                         {"AreaFocus": "Chicago", "Week" : potWeekChicago, "Month" : potMonthChicago }
                     ];
 
@@ -308,6 +308,8 @@ var PotHoleApp = Class.extend({
         if (!update) {
           var potHoleFeatureJson ={};
           mapContainer.potholesSeen = [];
+          mapContainer.potholesWeekSeen = [];
+          mapContainer.potholesMonthSeen = [];
           //console.log("creating potholes seen");
 		}
 		var potWeekCounter = 0;
@@ -315,7 +317,7 @@ var PotHoleApp = Class.extend({
 		
         potHoleCollection.forEach(function(d) {
 			var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
-			if ((!update) && (window.pc < 5)) {
+			if ((!update) || (window.pc < 5)) {
 				console.log("pushing on first run");
 				mapContainer.potholesSeen.push(d.service_request_number);
 				
@@ -341,6 +343,7 @@ var PotHoleApp = Class.extend({
 
 				if (d.daysAgo <8){
 					//this.potWeekCounter= this.potWeekCounter + 1;
+                    mapContainer.potholesWeekSeen.push(d.service_request_number);
 					potWeekCounter = potWeekCounter + 1;
 						potHoleFeatureJson = {
 								"type": "Feature",
@@ -354,7 +357,8 @@ var PotHoleApp = Class.extend({
 						L.geoJson(potHoleFeatureJson, { 
 							pointToLayer: function (feature, latlng) {
 								
-								var content = '<P><B> Date Reported: </B>' 
+								var content = '<b><center><u>Pothole Card</u></center></b>'
+                                            + '<P><B> Date Reported: </B>' 
 											+ moment(d.myDate).format("MMM Do YYYY") + '<br /><B> Status: </B>' 
 											+ d.status + '<B><BR> Street:</b> ' 
 											+ d.street_address + '<BR><b>'
@@ -384,7 +388,7 @@ var PotHoleApp = Class.extend({
 				}
 				else if (d.daysAgo < 31){
 					//console.log('d.daysAgo for pothholes'  +d.daysAgo);
-
+                    mapContainer.potholesMonthSeen.push(d.service_request_number);
 					potMonthCounter = potMonthCounter + 1;
 					potHoleFeatureJson = {
 								"type": "Feature",
@@ -398,10 +402,13 @@ var PotHoleApp = Class.extend({
 					L.geoJson(potHoleFeatureJson, { 
 						pointToLayer: function (feature, latlng) {
 							
-							var content = '<P><B>Date Reported:</B> ' + moment(d.myDate).format("MMM Do YYYY") + '<br><B>Status: </B>' 
-																		+ d.status +
-																        '<B><br>' 
-																		+ d.status_message +  '</P></b>';
+							var content = '<b><center><u>Pothole Card</u></center></b>'
+                                        + '<P><B>Date Reported:</B> ' 
+                                        + moment(d.myDate).format("MMM Do YYYY") + '<br><B>Status: </B>' 
+										+ d.status + '<B><BR> Street:</b> ' 
+                                        + d.street_address + '<BR><b>'
+										+ d.status_message +  '</P></b>';
+
 							var popup = L.popup().setContent(content);
 
 							var oldLeafIcon = L.Icon.extend({
@@ -451,7 +458,8 @@ var PotHoleApp = Class.extend({
 
 			   // d.myDate = new Date(d.myDate);
 				if (d.daysAgo <8){
-
+                    mapContainer.potholesWeekSeen.push(d.service_request_number);
+                    
 						potHoleFeatureJson = {
 								"type": "Feature",
 									"properties": {},
@@ -464,7 +472,8 @@ var PotHoleApp = Class.extend({
 						L.geoJson(potHoleFeatureJson, { 
 							pointToLayer: function (feature, latlng) {
 								
-								var content = '<P><B> Date Reported: </B>' 
+								var content = '<b><center><u>Pothole Card</u></center></b>'
+                                            + '<P><B> Date Reported: </B>' 
 											+ moment(d.myDate).format('MMM Do YYYY') + '<br /><B> Status: </B>' 
 											+ d.status + '<B><BR> Street:</b> ' 
 											+ d.street_address + '<BR>'
@@ -494,6 +503,7 @@ var PotHoleApp = Class.extend({
 				}
 				else if (d.daysAgo < 31){
 					//console.log('d.daysAgo for pothholes'  +d.daysAgo);
+                    mapContainer.potholesMonthSeen.push(d.service_request_number);
 					potHoleFeatureJson = {
 								"type": "Feature",
 									"properties": {},
@@ -506,9 +516,12 @@ var PotHoleApp = Class.extend({
 					L.geoJson(potHoleFeatureJson, { 
 						pointToLayer: function (feature, latlng) {
 							
-							var content = '<P><B> Reporting Date : <BR></B>' + d.myDate + '<br><B> Status: </B>' 
-																		+ d.status + '<B><br>' 
-																		+ d.status_message +  '</P>';
+							var content = '<b><center><u>Pothole Card</u></center></b>'
+                                        + '<P><B> Reporting Date : <BR></B>' 
+                                        + d.myDate + '<br><B> Status: </B>' 
+										+ d.status + '<B><BR> Street:</b> ' 
+                                        + d.street_address + '<BR><b>'
+										+ d.status_message +  '</P>';
 							var popup = L.popup().setContent(content);
 
 							var oldLeafIcon = L.Icon.extend({
@@ -633,7 +646,7 @@ var PotHoleApp = Class.extend({
             mapContainer.iterator = 'XX';
 		}
         //Getting the temperature
-        console.log('inside potHolePolylineLayerFunc');
+        //console.log('inside potHolePolylineLayerFunc');
         var lat = 41.8739580629, 
             lon = -87.6277394859;
 

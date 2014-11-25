@@ -18,11 +18,11 @@ var DivvyStationApp = Class.extend({
 ///////////////////////////////////////
 
     makeCallback: function (divvyCollection,update) {
-      console.log('inside makeCallback divvyApp... update is '+update)
+      //console.log('inside makeCallback divvyApp... update is '+update)
       if (!update) {
 	var divvyFeatureJson = {};
 	mapContainer.divvySeen = new Map;
-	console.log("creating potholes seen");
+	//console.log("creating potholes seen");
       }
       if (window.started) {
 	//mapContainer.DivvyStationLayer.clearLayers();
@@ -31,7 +31,7 @@ var DivvyStationApp = Class.extend({
 	  if (!update) {
 	    mapContainer.divvySeen[d.stationName] = statusStr;
 	  } else if (mapContainer.divvySeen[d.stationName] != statusStr) {
-	    console.log("divvyseen doesn't match the update "+mapContainer.divvySeen[d.station]+" != "+statusStr);
+	    //console.log("divvyseen doesn't match the update "+mapContainer.divvySeen[d.station]+" != "+statusStr);
 	    docksbikes = statusStr.split(",");
 	    window.updates.push("Divvy station at "+d.stationName+" now has "+docksbikes[0]+" docks and "+docksbikes[1]+" bikes available<br />");
 	    mapContainer.divvySeen[d.stationName] = statusStr;
@@ -52,7 +52,7 @@ var DivvyStationApp = Class.extend({
 	    }
 	    L.geoJson(divvyFeatureJson, {                        
 	      pointToLayer: function (feature, latlng) {
-		var content="<p><b>Location:</b> "+d.stationName+"<br/>"
+		var content="<b><center><u>Divvy Card</u></center></b><p><b>Location:</b> "+d.stationName+"<br/>"
 		+"<b>Available Bikes:</b> "+d.availableBikes+"<br/>"
 		+"<b>Abailable Docks:</b> "+d.availableDocks+"</p>";
 		var popup = L.popup().setContent(content);
@@ -172,7 +172,7 @@ var DivvyStationApp = Class.extend({
 
 
         this.makeCallbackFunc = this.makeCallback.bind(this);
-        console.log("divvy init works");
+        //console.log("divvy init works");
         //this.loadInIcons();
         //this.updateOutsideTemp();
     }

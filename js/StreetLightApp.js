@@ -54,8 +54,8 @@ var StreetLightApp = Class.extend({
     //Drawing the bar chart for Origin distribution for the first visualization group.  
     drawBarChart: function (data)
     {
-        console.log('Inside drawBarChart');
-        console.log(data);
+        //console.log('Inside drawBarChart');
+        //console.log(data);
         this.updateWindow();
         var width = this.barCanvasWidth;
         var height = this.barCanvasHeight;
@@ -161,7 +161,7 @@ var StreetLightApp = Class.extend({
             return (x0(d.AreaFocus) + (x0.rangeBand()/2)) - 25;
             })  
             .attr("y", function(d) {
-                return y(Math.max(d.week, d.month) + 10);
+                return y(Math.max(d.Week, d.Month) + 10);
             })
             .style("font-size","20pt");
 
@@ -224,7 +224,7 @@ var StreetLightApp = Class.extend({
     /////////////////////////////////////////////////////////////
 
     updateData: function (){    
-        console.log('updateData StreetLight');
+        //console.log('updateData StreetLight');
         //var fileToLoad = "App/json/InboundOutboundTrips/max_inbound_outbound_flow.json";
         var streetLightChicago = 'https://data.cityofchicago.org/resource/zuxi-7xem.json?&$order=creation_date%20DESC';
             
@@ -263,7 +263,7 @@ var StreetLightApp = Class.extend({
                     var data2 = response.filter(function(d,i){
 
                         var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
-                        console.log(d.creation_date);
+                        //console.log(d.creation_date);
                         var today = new Date();
                         if(d.creation_date != null){
 
@@ -281,11 +281,11 @@ var StreetLightApp = Class.extend({
 
                     var streetJson = 
                     [
-                        { "AreaFocus" : "SelectedArea", "Week" : streetWeekSelection, "Month" : streetMonthSelection},
+                        { "AreaFocus" : "SelectedArea", "Week" : mapContainer.streetlightsWeekSeen.length, "Month" : mapContainer.streetlightsMonthSeen.length},
                         {"AreaFocus": "Chicago", "Week" : streetWeekChicago, "Month" : streetMonthChicago }
                     ];
 
-                    console.log('Street Light Data' +  streetWeekSelection + streetMonthSelection + streetWeekChicago + streetMonthChicago);
+                    //console.log('Street Light Data' +  streetWeekSelection + streetMonthSelection + streetWeekChicago + streetMonthChicago);
 
                     self.streetJson = streetJson;
 
@@ -305,21 +305,25 @@ var StreetLightApp = Class.extend({
 ////////////////////////////////////////////////////////////////////
 
     makeCallback: function (streetLightCollection,update) {
-        console.log("inside makeCallback for streetlights");
+        //console.log("inside makeCallback for streetlights");
         ///////////////////////////
 		if (!update) {
 			var streetFeatureJson ={};
-			var streetWeekCounter = 0;
-			var streetMonthCounter = 0;
 			mapContainer.streetlightsSeen = [];
+            mapContainer.streetlightsWeekSeen = [];
+            mapContainer.streetlightsMonthSeen = [];
             this.StreetIterator = 'XX';
 		}
         ///////////////////////////
 
+
+            var streetWeekCounter = 0;
+            var streetMonthCounter = 0;
+
         streetLightCollection.forEach(function(d) {
 
             var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
-			if (!update) {
+			if ((!update) || (window.sc < 5)) {
 	            if (d.latitude && d.longitude)
 	                {
 	                mapContainer.streetlightsSeen.push(d.service_request_number);
@@ -346,6 +350,7 @@ var StreetLightApp = Class.extend({
 	
 	                    if(d.daysAgo < 15){
 	                        streetWeekCounter = streetWeekCounter + 1;
+                            mapContainer.streetlightsWeekSeen.push(d.service_request_number);
 	                        streetLightFeatureJson = {
 	                                "type": "Feature",
 	                                    "properties": {},
@@ -359,7 +364,8 @@ var StreetLightApp = Class.extend({
 	                            L.geoJson(streetLightFeatureJson, { 
 	                                pointToLayer: function (feature, latlng) {
 	                                    
-	                                    var content = '<P><B> Date Reported: </B>' 
+	                                    var content = '<b><center><u>StreeLights Card</u></center></b>'
+                                                    + '<P><B> Date Reported: </B>' 
 	                                                + moment(d.myDate).format("MMM Do YYYY") + '<br /><B> Status: </B>' 
 	                                                + d.status + '<B><BR> Street: </b>' 
 	                                                + d.street_address + '<BR><b>'
@@ -388,6 +394,7 @@ var StreetLightApp = Class.extend({
 	                    }
 	                    else if (d.daysAgo < 31){
 	                        streetMonthCounter = streetMonthCounter + 1;
+                            mapContainer.streetlightsMonthSeen.push(d.service_request_number);
 	                        streetLightFeatureJson = {
 	                            "type": "Feature",
 	                                "properties": {},
@@ -401,7 +408,8 @@ var StreetLightApp = Class.extend({
 	                        L.geoJson(streetLightFeatureJson, { 
 	                        pointToLayer: function (feature, latlng) {
 	                      
-	                            var content = '<P><B> Date Reported: </B>' 
+	                            var content = '<b><center><u>StreeLights Card</u></center></b>'
+                                            + '<P><B> Date Reported: </B>' 
 	                                            + moment(d.myDate).format("MMM Do YYYY") + '<br /><B> Status : </B>' 
 	                                            + d.status + '<B><BR> Street:</b> ' 
 	                                            + d.street_address + '<BR><b>'
@@ -418,7 +426,7 @@ var StreetLightApp = Class.extend({
 	                                fillOpacity: 0.8
 	                            };*/
 	                            var redMarker = 
-	                             L.AwesomeMarkers.icon({icon: 'lightbulb-o', markerColor: 'grey', prefix: 'fa', iconColor: 'black'});
+	                             L.AwesomeMarkers.icon({icon: 'lightbulb-o', markerColor: 'black', prefix: 'fa', iconColor: 'yellow'});
 	
 	                        var marker = L.marker(latlng, {icon: redMarker});
 	                            marker.bindPopup(popup);
@@ -427,10 +435,10 @@ var StreetLightApp = Class.extend({
 	                        }
 	                        }).addTo(mapContainer.StreetLightLayer);
 	                    }
+				}
 	
-	
-	                }
-			} else if (mapContainer.potholesSeen.indexOf(d.service_request_number) == -1) {
+	                
+			} else if (mapContainer.streetlightsSeen.indexOf(d.service_request_number) == -1) {
 				mapContainer.streetlightsSeen.push(d.service_request_number);
 				window.updates.push("New streetlight data found at "+d.street_address+" - "+d.type_of_service_request+"<br />");
 					            if (d.latitude && d.longitude)
@@ -458,6 +466,7 @@ var StreetLightApp = Class.extend({
 	
 	                    if(d.daysAgo < 15){
 	                        streetWeekCounter = streetWeekCounter + 1;
+                            mapContainer.streetlightsWeekSeen.push(d.service_request_number);
 	                        streetLightFeatureJson = {
 	                                "type": "Feature",
 	                                    "properties": {},
@@ -471,7 +480,8 @@ var StreetLightApp = Class.extend({
 	                            L.geoJson(streetLightFeatureJson, { 
 	                                pointToLayer: function (feature, latlng) {
 	                                    
-	                                    var content = '<P><B> Date Reported: </B>' 
+	                                    var content = '<b><center><u>StreeLights Card</u></center></b>'
+                                                    + '<P><B> Date Reported: </B>' 
 	                                                + moment(d.myDate).format("MMM Do YYYY") + '<br /><B> Status: </B>' 
 	                                                + d.status + '<B><BR> Street: </b>' 
 	                                                + d.street_address + '<BR><b>'
@@ -489,7 +499,7 @@ var StreetLightApp = Class.extend({
 	                                    };
 	                                    */
 	                                    var redMarker = 
-	                             L.AwesomeMarkers.icon({icon: 'lightbulb-o', markerColor: 'red', prefix: 'fa', iconColor: 'black'});
+	                             L.AwesomeMarkers.icon({icon: 'lightbulb-o', markerColor: '#d8ad95', prefix: 'fa', iconColor: 'black'});
 	
 	                            var marker = L.marker(latlng, {icon: redMarker});
 	                                marker.bindPopup(popup);
@@ -500,6 +510,7 @@ var StreetLightApp = Class.extend({
 	                    }
 	                    else if (d.daysAgo < 31){
 	                        streetMonthCounter = streetMonthCounter + 1;
+                            mapContainer.streetlightsMonthSeen.push(d.service_request_number);
 	                        streetLightFeatureJson = {
 	                            "type": "Feature",
 	                                "properties": {},
@@ -513,11 +524,12 @@ var StreetLightApp = Class.extend({
 	                        L.geoJson(streetLightFeatureJson, { 
 	                        pointToLayer: function (feature, latlng) {
 	                      
-	                            var content = '<P><B> Date Reported: </B>' 
-	                                            + moment(d.myDate).format("MMM Do YYYY") + '<br /><B> Status : </B>' 
-	                                            + d.status + '<B><BR> Street:</b> ' 
-	                                            + d.street_address + '<BR><b>'
-	                                            + d.status_message +  '</b></P>';      
+	                            var content = '<b><center><u>StreetLights Card</u></center></b>'
+                                            + '<P><B> Date Reported: </B>' 
+                                            + moment(d.myDate).format("MMM Do YYYY") + '<br /><B> Status : </B>' 
+                                            + d.status + '<B><BR> Street:</b> ' 
+                                            + d.street_address + '<BR><b>'
+                                            + d.status_message +  '</b></P>';      
 	                            //console.log('POTHOLE');
 	                            var popup = L.popup().setContent(content);
 	
@@ -530,7 +542,7 @@ var StreetLightApp = Class.extend({
 	                                fillOpacity: 0.8
 	                            };*/
 	                            var redMarker = 
-	                             L.AwesomeMarkers.icon({icon: 'lightbulb-o', markerColor: 'grey', prefix: 'fa', iconColor: 'black'});
+	                             L.AwesomeMarkers.icon({icon: 'lightbulb-o', markerColor: '#d8ad95', prefix: 'fa', iconColor: 'black'});
 	
 	                        var marker = L.marker(latlng, {icon: redMarker});
 	                            marker.bindPopup(popup);
@@ -573,7 +585,7 @@ var StreetLightApp = Class.extend({
 // STREET LIGHT CALLBACK FOR BOX CALL 
 ////////////////////////////////////////////////////////////////////
 
-    streetLightLayerFunc: function (marLat1,marLng1,marLat2,marLng2) {
+    streetLightLayerFunc: function (marLat1,marLng1,marLat2,marLng2,update) {
         
         this.marLat1 = marLat1;
         this.marLng1 = marLng1;
@@ -581,7 +593,7 @@ var StreetLightApp = Class.extend({
         this.marLng2 = marLng2;
 
         // Clear data from the layer
-        mapContainer.StreetLightLayer.clearLayers(); 
+        //mapContainer.StreetLightLayer.clearLayers(); 
 
         var self = this;
 
@@ -605,7 +617,7 @@ var StreetLightApp = Class.extend({
                     console.log("NO DATA at " + this.marLat1 + " " + this.marLng1);
                     return;
                     }
-                    self.makeCallbackFunc(response);
+                    self.makeCallbackFunc(response,update);
                 });
 
     },
@@ -613,14 +625,14 @@ var StreetLightApp = Class.extend({
 ////////////////////////////////////////////////////////////////////
 // STREET LIGHT CALLBACK FOR BOX CALL 
 ////////////////////////////////////////////////////////////////////
-    streetLightPolylineLayerFunc: function (lat,lng) {
+    streetLightPolylineLayerFunc: function (lat,lng,update) {
 
         this.marPolyLat = lat;
         this.marPolyLng = lng;
 
         // Clear previous data from the layer
 
-        mapContainer.StreetLightLayer.clearLayers();
+        //mapContainer.StreetLightLayer.clearLayers();
 
         var self = this;
 
@@ -646,7 +658,7 @@ var StreetLightApp = Class.extend({
                     console.log("NO DATA at " + this.marPolyLat + " " + this.marPolyLng );
                     return;
                     }
-                    self.makeCallbackFunc(response);
+                    self.makeCallbackFunc(response,update);
                 });
 
     },

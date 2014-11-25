@@ -84,7 +84,7 @@ var CTATrackerApp = Class.extend({
                             var popup = L.popup().setContent(content);
 
                             var redMarker = 
-                             L.AwesomeMarkers.icon({icon: 'bus', markerColor: 'blue', prefix: 'fa', iconColor: 'black'});
+                             L.AwesomeMarkers.icon({icon: 'bus', markerColor: 'green', prefix: 'fa', iconColor: 'black'});
 
                                 var marker = L.marker(latlng,{icon: redMarker});
                                                 marker.bindPopup(popup);
