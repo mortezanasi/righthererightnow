@@ -93,6 +93,6 @@ Shahbaz worked on visualizations needed for statistics in the project. Shahbaz w
 
 Christopher worked worked on graphs and documentation needed for the project
 
-*Michael Thompson*
+*__mt__*
 
-Michael worked majorly on the UI elements and the design decisions of the overall project. He also implemented the refresh functionality of the complete project and notification center to display any new information coming up. He also implemented with leaflet routing machine and worked out chinks in the application. 
+__mt__ worked majorly on the UI elements and the design decisions of the overall project. He also implemented the refresh functionality of the complete project and notification center to display any new information coming up. He also implemented with leaflet routing machine and worked out chinks in the application. 
